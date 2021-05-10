@@ -6,17 +6,16 @@ using System.Text;
 
 namespace BulkyBook.Models
 {
-    public class Category
+    public class CategoryCsv
     {
-        [Key]
         [Name("テスト")]
-        [Range(30,40)]
         public int Id { get; set; }
         
-        [Display(Name="Category Name")]
-        [Required]
-        [MaxLength(50)]
+
         [Name("テスト名")]
         public string Name { get; set; }
+
+        [Name("結果")]
+        public string Result { get; set; }
     }
 }

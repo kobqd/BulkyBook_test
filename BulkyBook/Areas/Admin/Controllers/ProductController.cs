@@ -1,4 +1,5 @@
-﻿using BulkyBook.DataAccess.Data;
+﻿using AutoMapper;
+using BulkyBook.DataAccess.Data;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
@@ -14,6 +15,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BulkyBook.Areas.Admin.Controllers
@@ -85,27 +87,47 @@ namespace BulkyBook.Areas.Admin.Controllers
                     var upload = Path.Combine(webRootPath, @"images\products");
                     var extention = Path.GetExtension(files[0].FileName);
 
-                    //using (var reader = new StreamReader(files[0].OpenReadStream()))
-                    //using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    var categoryCsv = new CategoryCsv();
+
+                    var config = new MapperConfiguration(cfg => cfg.CreateMap<Category, CategoryCsv>());
+                    IMapper mapper = config.CreateMapper();
+
+                    using (var reader = new StreamReader(files[0].OpenReadStream()))
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    using (var write = new StreamWriter(upload + "\\NewCustomCategory.csv"))
+                    using (var csvWrite = new CsvWriter(write, CultureInfo.InvariantCulture))
+                    {
+                        csv.Read();
+                        csv.ReadHeader();
+                        csvWrite.WriteHeader<CategoryCsv>();
+                        csvWrite.NextRecord();
+                        while (csv.Read())
+                        {
+                            var category = csv.GetRecord<Category>();
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append("OK");
+                            sb.Append("OK2");
+                            sb.Append("OK3");
+
+                            categoryCsv = mapper.Map<Category, CategoryCsv>(category);
+                            sb.Append("OK4");
+                            //categoryCsv.Id = category.Id;
+                            //categoryCsv.Name = category.Name;
+                            categoryCsv.Result = sb.ToString();
+
+                            csvWrite.WriteRecord(categoryCsv);
+                            csvWrite.NextRecord();
+                            _unitOfWork.Category.Add(category);
+                        }
+                        _unitOfWork.Save();
+
+                    }
+
+
+                    //using (var write = new StreamWriter(upload + "\\NewCategory.csv"))
+                    //using (var csvWrite = new CsvWriter(write, CultureInfo.InvariantCulture))
                     //{
-                    //    csv.Read();
-                    //    csv.ReadHeader();
-                    //    while (csv.Read())
-                    //    {
-                    //        var category = csv.GetRecord<Category>();
-                    //        _unitOfWork.Category.Add(category);
-                    //    }
-                    //    _unitOfWork.Save();
-
-                    //}
-
-
-
-                    //var categories = _unitOfWork.Category.GetAll();
-                    //using (var write = new StreamWriter(upload+"\\NewCategory.csv"))
-                    //using (var csv = new CsvWriter(write, CultureInfo.InvariantCulture))
-                    //{
-                    //    csv.WriteRecords(categories);
+                    //    csvWrite.WriteRecords(categories);
 
                     //}
 
@@ -135,7 +157,7 @@ namespace BulkyBook.Areas.Admin.Controllers
                     //        }
                     //    }
                     //}
-                    
+
                     //using (var connection = new MySqlConnection(ConnectionString+ ";AllowLoadLocalInfile=True;"))
                     //{
                     //    connection.Open();
@@ -150,7 +172,7 @@ namespace BulkyBook.Areas.Admin.Controllers
                     //    //bulkCopy.ColumnMappings.AddRange(GetMySqlColumnMapping(tblcsv));
 
                     //    bulkCopy.WriteToServer(tblcsv);
-                            
+
 
                     //    connection.Close();
 
@@ -158,7 +180,7 @@ namespace BulkyBook.Areas.Admin.Controllers
                     //SET GLOBAL local_infile = 1
 
 
-                        if (productVM.Product.ImageUrl != null)
+                    if (productVM.Product.ImageUrl != null)
                         {
                             // this is an edit and we need to remove old image
                             var imagePath = Path.Combine(webRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
