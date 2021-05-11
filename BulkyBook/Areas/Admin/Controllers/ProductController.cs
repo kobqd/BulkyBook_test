@@ -129,8 +129,7 @@ namespace BulkyBook.Areas.Admin.Controllers
                     //{
                     //    csvWrite.WriteRecords(categories);
 
-                    //}
-
+                    //}                 
 
 
                     //DataTable tblcsv = new DataTable();
@@ -270,3 +269,11 @@ namespace BulkyBook.Areas.Admin.Controllers
     }
 
 }
+//select*
+//    from hr.TEST
+//    unpivot
+//    (
+//     value
+//    for 金額 IN (金額01 AS '01', 金額02, 金額03, 金額04)
+//    )
+//    fetch first 100 rows only;
