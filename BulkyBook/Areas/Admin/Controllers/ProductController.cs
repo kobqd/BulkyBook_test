@@ -277,3 +277,8 @@ namespace BulkyBook.Areas.Admin.Controllers
 //    for 金額 IN (金額01 AS '01', 金額02, 金額03, 金額04)
 //    )
 //    fetch first 100 rows only;
+
+//SELECT listagg(column_name||',')
+//  FROM user_tab_cols
+// WHERE table_name = 'TEST'
+//   AND REGEXP_LIKE(column_name, '金額\d{2}')
